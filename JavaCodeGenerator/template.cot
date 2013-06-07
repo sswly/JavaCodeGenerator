@@ -37,6 +37,10 @@ CodeFactory.getFileName = function(source) {
         }
 
         path = path + "\\" + names[i];
+        if (packageInfo != "") {
+            packageInfo += ".";
+        }
+        packageInfo += names[i];
         if (!folderExists(path)) {
             createFolder(path);
         }
@@ -200,14 +204,20 @@ CodeFactory.Class.getMethodImpl = function(source, indent) {
     sourceCode = CodeFactory.getSourceCode(current());
     
     if (sourceCode){
+        var packageInfo = "";
         var fileName = CodeFactory.getFileName(current()); 
         println("Create file " + fileName);
+
         //fileBegin(getTarget()+"\\"+current().Name+".java");
         fileBegin(fileName);
 
+        if (packageInfo != "") {
+            print("package " + packageInfo + ";\n\n")
+        }
         print(sourceCode);
 
         fileEnd();
     }
 @>
 <@ENDREPEAT@>
+
