@@ -1,0 +1,213 @@
+<@SCRIPT
+var gIndent = "    ";
+var candidateClass = getArgument("TargetClass");
+var startLine = getArgument("CodeStartMarkLine");
+var endLine = getArgument("CodeEndMarkLine");
+var target = getArgument("target");
+
+CodeFactory = {};
+CodeFactory.Class = {};
+CodeFactory.Class.Method = {};
+CodeFactory.getSourceCode = function(source) {
+    var sourceCode = "";
+    switch(source.GetClassName()){
+        case "UMLClass":
+            if (candidateClass == "" || candidateClass.indexOf(source.Name) != -1) {
+                sourceCode = CodeFactory.Class.getSourceCode(source);
+            }
+            break;
+
+        case "UMLEnumeration":
+        case "UMLInterface":
+        case "UMLException":
+        case "UMLSignal":
+
+        default:
+    }
+    
+    return sourceCode;
+}
+
+CodeFactory.getFileName = function(source) {
+    var path = getTarget() + "\\";
+    var names = source.Pathname.split("::");
+    for (i=2; i<names.length; i++) {
+        if (names[i] == source.Name) {
+            return path + "\\" + source.Name + ".java";
+        }
+
+        path = path + "\\" + names[i];
+        if (!folderExists(path)) {
+            createFolder(path);
+        }
+    }
+}
+
+CodeFactory.Class.getSourceCode = function(source) {
+    var attrs = CodeFactory.Class.getAttrsCode(source, gIndent);
+    var methods = CodeFactory.Class.getMethodsCode(source, gIndent);
+    return "public class " + source.Name + " {\n" 
+        + attrs + methods + "}";
+}
+
+CodeFactory.Class.getAttrsCode = function(source, indent) {
+    var sourceCode = "";
+    var n = source.GetAttributeCount();
+    print("number of attr is " + n);
+    var i;
+    for (i = 0;  i < n; i++) {
+        var attr = source.GetAttributeAt(i);
+
+        visibility = CodeFactory.Class.getVisibility(attr);
+        sourceCode += indent + visibility + attr.TypeExpression + " " + attr.Name + ";\n";
+        print(sourceCode);
+    }
+   
+    if (sourceCode.localeCompare("") != 0) {
+        return sourceCode + "\n\n";
+    } 
+    return sourceCode;
+}
+
+CodeFactory.Class.getMethodsCode = function(source, indent) {
+    var sourceCode = "";
+    var n = source.GetOperationCount();
+    println("Operation num is " + n)
+    var i = 0;
+    for (i=0; i < n; i++) {
+        println("current round is " + i)
+        operation = source.GetOperationAt(i);
+
+        visibility = CodeFactory.Class.getVisibility(operation);
+        scope      = CodeFactory.Class.getScope(operation);
+        parameters = CodeFactory.Class.getParameters(operation);
+        type       = CodeFactory.Class.getReturnType(operation);
+        body       = CodeFactory.Class.getMethodImpl(operation, gIndent);
+
+        sourceCode +=  indent + visibility + scope + type + operation.Name 
+            + "("  + parameters + ") {\n";
+        sourceCode +=  body + indent + "}\n\n";
+    }
+    return sourceCode;
+}
+
+CodeFactory.Class.getVisibility = function(source) {
+    var visibilityStr = "";
+    var visibility;
+
+    try {
+        visibility = source.MOF_GetAttribute("Visibility");
+    }catch(error){
+        visibility = null;
+    }
+    
+    switch(visibility){
+            
+        case "vkPackage":
+            visibilityStr    = "internal";
+            break;
+            
+        case "vkPrivate":
+            visibilityStr    = "private";
+            break;
+            
+        case "vkProtected":
+            visibilityStr    = "protected";
+            break;
+            
+        case "vkPublic":
+        default:
+            visibilityStr    = "public";
+            break;
+    }
+    
+    return visibilityStr + " ";
+}
+
+CodeFactory.Class.getScope = function(source) {
+    try {
+        if (source.MOF_GetAttribute("OwnerScope") == "skClassifier") {
+            return "static ";
+        }
+    }catch(error){
+    }
+    return "";
+}
+
+CodeFactory.Class.getParameters = function(source) {
+    print("Enter CodeFactory.Class.getParameters\n")
+    var paraSrcCode = "";
+
+    try {
+        var n = source.GetParameterCount();
+        var i = 0;
+        for (i=0; i<n; i++) {
+            parameter = source.GetParameterAt(i);
+            if (parameter.MOF_GetAttribute("DirectionKind") != "pdkReturn") {
+                paraSrcCode += parameter.TypeExpression + " " + parameter.Name;
+            }
+        }
+    } catch(error) {
+    }
+    print(paraSrcCode)
+    return paraSrcCode;
+}
+
+CodeFactory.Class.getReturnType = function(source) {
+    try {
+        var n = source.GetParameterCount();
+        var i = 0;
+        for (i=0; i<n; i++) {
+            parameter = source.GetParameterAt(i);
+            if (parameter.MOF_GetAttribute("DirectionKind") == "pdkReturn") {
+                return parameter.TypeExpression + " ";
+            }
+        }
+    } catch(error) {
+    }
+
+    return "void ";
+}
+
+CodeFactory.Class.getMethodImpl = function(source, indent) {
+    if (!source.Documentation) return "";
+
+    var src = null;
+    var doc = source.Documentation.replace(/\r\n/g, "\n");
+    doc = doc.replace(/\r/g, "\n");
+
+    var lines = doc.split("\n");
+    var i = 0;
+    for(i=0; i<lines.length; i++) {
+        if (src == null) {
+            if (lines[i].indexOf(startLine) != -1) {
+                src = "";
+            }
+        } else {
+            if (lines[i].indexOf(endLine) != -1) {
+                return src;
+            }
+            src += indent + lines[i].replace(/\\@/g, gIndent) + "\n";
+        }
+    }
+    return "";
+}
+
+@>
+
+<@REPEAT {R}::;UMLClassifier;;@>
+<@SCRIPT
+    sourceCode = CodeFactory.getSourceCode(current());
+    
+    if (sourceCode){
+        var fileName = CodeFactory.getFileName(current()); 
+        println("Create file " + fileName);
+        //fileBegin(getTarget()+"\\"+current().Name+".java");
+        fileBegin(fileName);
+
+        print(sourceCode);
+
+        fileEnd();
+    }
+@>
+<@ENDREPEAT@>
