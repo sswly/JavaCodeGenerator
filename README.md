@@ -30,3 +30,5 @@ Feature
 * Generate the Java code according to the class define in class diagram
 * Generate the folder structure according to the package structure in class diagram
 * Embed the method implementation code into the document of method with configurable mark line
+* [TODO] Generate the code comment that follow the Javdoc
+  * [TODO] Generate the code comment for class
