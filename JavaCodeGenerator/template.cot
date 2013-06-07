@@ -85,7 +85,12 @@ CodeFactory.Class.getMethodsCode = function(source, indent) {
         visibility = CodeFactory.Class.getVisibility(operation);
         scope      = CodeFactory.Class.getScope(operation);
         parameters = CodeFactory.Class.getParameters(operation);
-        type       = CodeFactory.Class.getReturnType(operation);
+
+        var type = "";
+        if (operation.StereotypeName != "create") {
+            type   = CodeFactory.Class.getReturnType(operation);
+        }
+
         body       = CodeFactory.Class.getMethodImpl(operation, gIndent);
 
         sourceCode +=  indent + visibility + scope + type + operation.Name 
