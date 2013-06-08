@@ -6,23 +6,26 @@ var endLine = getArgument("CodeEndMarkLine");
 var target = getArgument("target");
 
 CodeFactory = {};
-CodeFactory.Class = {};
-CodeFactory.Class.Method = {};
+
 CodeFactory.getSourceCode = function(source) {
     var sourceCode = "";
+    var type = "";
     switch(source.GetClassName()){
         case "UMLClass":
-            if (candidateClass == "" || candidateClass.indexOf(source.Name) != -1) {
-                sourceCode = CodeFactory.Class.getSourceCode(source);
-            }
+            type = "class";
             break;
-
-        case "UMLEnumeration":
         case "UMLInterface":
+            type = "interface"
+            break;
+        case "UMLEnumeration":
         case "UMLException":
         case "UMLSignal":
 
         default:
+    }
+
+    if (type != "") {
+        sourceCode = CodeFactory.getOOSourceCode(source, type);
     }
     
     return sourceCode;
@@ -47,24 +50,63 @@ CodeFactory.getFileName = function(source) {
     }
 }
 
-CodeFactory.Class.getSourceCode = function(source) {
-    var attrs = CodeFactory.Class.getAttrsCode(source, gIndent);
-    var methods = CodeFactory.Class.getMethodsCode(source, gIndent);
-    return "public class " + source.Name + " {\n" 
+CodeFactory.getOOSourceCode = function(source, type) {
+    var geners = CodeFactory.getGeneralization(source);
+    var impIfs = CodeFactory.getImplInterface(source);
+    var attrs = CodeFactory.getAttrsCode(source, gIndent);
+    var methods = CodeFactory.getMethodsCode(source, gIndent);
+
+    if (type == "interface") {
+        return "public interface " + source.Name +  " " + geners + "{\n"
+            + attrs + methods + "}";
+    }
+    return "public class " + source.Name + " " + geners + impIfs + "{\n" 
         + attrs + methods + "}";
 }
 
-CodeFactory.Class.getAttrsCode = function(source, indent) {
+CodeFactory.getGeneralization = function(source) {
+    var sourceCode = "";
+    var n = source.GetGeneralizationCount();
+
+    for (i = 0;  i < n; i++) {
+        gener = source.GetGeneralizationAt(i);
+
+        if (source.Name == gener.Child.Name) {
+            return "extends " + gener.Parent.Name + " ";
+        }
+    }
+    return sourceCode;
+}
+
+CodeFactory.getImplInterface = function(source) {
+    var sourceCode = "";
+    var n = source.GetClientDependencyCount();
+    
+    for (i = 0;  i < n; i++) {
+        depen = source.GetClientDependencyAt(i);
+        if (depen.GetClassName() != "UMLRealization") {
+            continue;
+        }
+
+        if (sourceCode != "") {
+            sourceCode += ", ";
+        }
+        sourceCode += depen.Supplier.Name;
+    }
+    return "implements " + sourceCode + " ";
+}
+
+CodeFactory.getAttrsCode = function(source, indent) {
     var sourceCode = "";
     var n = source.GetAttributeCount();
-    print("number of attr is " + n);
+    println("number of attr is " + n);
     var i;
     for (i = 0;  i < n; i++) {
         var attr = source.GetAttributeAt(i);
 
-        visibility = CodeFactory.Class.getVisibility(attr);
+        visibility = CodeFactory.getVisibility(attr);
         sourceCode += indent + visibility + attr.TypeExpression + " " + attr.Name + ";\n";
-        print(sourceCode);
+        println(sourceCode);
     }
    
     if (sourceCode.localeCompare("") != 0) {
@@ -73,7 +115,7 @@ CodeFactory.Class.getAttrsCode = function(source, indent) {
     return sourceCode;
 }
 
-CodeFactory.Class.getMethodsCode = function(source, indent) {
+CodeFactory.getMethodsCode = function(source, indent) {
     var sourceCode = "";
     var n = source.GetOperationCount();
     println("Operation num is " + n)
@@ -82,16 +124,16 @@ CodeFactory.Class.getMethodsCode = function(source, indent) {
         println("current round is " + i)
         operation = source.GetOperationAt(i);
 
-        visibility = CodeFactory.Class.getVisibility(operation);
-        scope      = CodeFactory.Class.getScope(operation);
-        parameters = CodeFactory.Class.getParameters(operation);
+        visibility = CodeFactory.getVisibility(operation);
+        scope      = CodeFactory.getScope(operation);
+        parameters = CodeFactory.getParameters(operation);
 
         var type = "";
         if (operation.StereotypeName != "create") {
-            type   = CodeFactory.Class.getReturnType(operation);
+            type   = CodeFactory.getReturnType(operation);
         }
 
-        body       = CodeFactory.Class.getMethodImpl(operation, gIndent);
+        body       = CodeFactory.getMethodImpl(operation, gIndent);
 
         sourceCode +=  indent + visibility + scope + type + operation.Name 
             + "("  + parameters + ") {\n";
@@ -100,7 +142,7 @@ CodeFactory.Class.getMethodsCode = function(source, indent) {
     return sourceCode;
 }
 
-CodeFactory.Class.getVisibility = function(source) {
+CodeFactory.getVisibility = function(source) {
     var visibilityStr = "";
     var visibility;
 
@@ -133,7 +175,7 @@ CodeFactory.Class.getVisibility = function(source) {
     return visibilityStr + " ";
 }
 
-CodeFactory.Class.getScope = function(source) {
+CodeFactory.getScope = function(source) {
     try {
         if (source.MOF_GetAttribute("OwnerScope") == "skClassifier") {
             return "static ";
@@ -143,8 +185,8 @@ CodeFactory.Class.getScope = function(source) {
     return "";
 }
 
-CodeFactory.Class.getParameters = function(source) {
-    print("Enter CodeFactory.Class.getParameters\n")
+CodeFactory.getParameters = function(source) {
+    println("Enter CodeFactory.getParameters")
     var paraSrcCode = "";
 
     try {
@@ -158,11 +200,11 @@ CodeFactory.Class.getParameters = function(source) {
         }
     } catch(error) {
     }
-    print(paraSrcCode)
+    println(paraSrcCode)
     return paraSrcCode;
 }
 
-CodeFactory.Class.getReturnType = function(source) {
+CodeFactory.getReturnType = function(source) {
     try {
         var n = source.GetParameterCount();
         var i = 0;
@@ -178,7 +220,7 @@ CodeFactory.Class.getReturnType = function(source) {
     return "void ";
 }
 
-CodeFactory.Class.getMethodImpl = function(source, indent) {
+CodeFactory.getMethodImpl = function(source, indent) {
     if (!source.Documentation) return "";
 
     var src = null;
@@ -196,7 +238,7 @@ CodeFactory.Class.getMethodImpl = function(source, indent) {
             if (lines[i].indexOf(endLine) != -1) {
                 return src;
             }
-            src += indent + lines[i].replace(/\\@/g, gIndent) + "\n";
+            src += indent + lines[i] + "\n";
         }
     }
     return "";
@@ -206,18 +248,20 @@ CodeFactory.Class.getMethodImpl = function(source, indent) {
 
 <@REPEAT {R}::;UMLClassifier;;@>
 <@SCRIPT
-    sourceCode = CodeFactory.getSourceCode(current());
+    if (candidateClass == "" || candidateClass.indexOf(current().Name) != -1) {
+        sourceCode = CodeFactory.getSourceCode(current());
+    } else {
+        sourceCode = null;
+    }
     
     if (sourceCode){
         var packageInfo = "";
         var fileName = CodeFactory.getFileName(current()); 
-        println("Create file " + fileName);
 
-        //fileBegin(getTarget()+"\\"+current().Name+".java");
         fileBegin(fileName);
 
         if (packageInfo != "") {
-            print("package " + packageInfo + ";\n\n")
+            println("package " + packageInfo + ";\n")
         }
         print(sourceCode);
 
