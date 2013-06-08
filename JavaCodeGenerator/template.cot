@@ -1,5 +1,8 @@
 <@SCRIPT
 var gIndent = "    ";
+var gCommentStart = "/**\n";
+var gCommentPrefix = " * ";
+var gCommentEnd = " */\n";
 var candidateClass = getArgument("TargetClass");
 var startLine = getArgument("CodeStartMarkLine");
 var endLine = getArgument("CodeEndMarkLine");
@@ -51,17 +54,20 @@ CodeFactory.getFileName = function(source) {
 }
 
 CodeFactory.getOOSourceCode = function(source, type) {
+    var sourceCode = CodeFactory.comment(source, "");
+    sourceCode += gCommentEnd;
+
     var geners = CodeFactory.getGeneralization(source);
     var impIfs = CodeFactory.getImplInterface(source);
     var attrs = CodeFactory.getAttrsCode(source, gIndent);
     var methods = CodeFactory.getMethodsCode(source, gIndent);
 
     if (type == "interface") {
-        return "public interface " + source.Name +  " " + geners + "{\n"
-            + attrs + methods + "}";
+        return sourceCode + "public interface " + source.Name 
+            +  " " + geners + "{\n" + attrs + methods + "}";
     }
-    return "public class " + source.Name + " " + geners + impIfs + "{\n" 
-        + attrs + methods + "}";
+    return sourceCode +"public class " + source.Name + " " 
+        + geners + impIfs + "{\n" + attrs + methods + "}";
 }
 
 CodeFactory.getGeneralization = function(source) {
@@ -124,19 +130,20 @@ CodeFactory.getMethodsCode = function(source, indent) {
         println("current round is " + i)
         operation = source.GetOperationAt(i);
 
+        methodComment = CodeFactory.comment(operation, gIndent);
         visibility = CodeFactory.getVisibility(operation);
         scope      = CodeFactory.getScope(operation);
-        parameters = CodeFactory.getParameters(operation);
+        parameters = CodeFactory.getParameters(operation, indent);
 
         var type = "";
         if (operation.StereotypeName != "create") {
             type   = CodeFactory.getReturnType(operation);
         }
 
-        body       = CodeFactory.getMethodImpl(operation, gIndent);
+        body       = CodeFactory.getMethodImpl(operation, gIndent + gIndent);
 
-        sourceCode +=  indent + visibility + scope + type + operation.Name 
-            + "("  + parameters + ") {\n";
+        sourceCode +=  methodComment + gIndent + gCommentEnd + indent + visibility + scope 
+            + type + operation.Name + "("  + parameters + ") {\n";
         sourceCode +=  body + indent + "}\n\n";
     }
     return sourceCode;
@@ -185,7 +192,7 @@ CodeFactory.getScope = function(source) {
     return "";
 }
 
-CodeFactory.getParameters = function(source) {
+CodeFactory.getParameters = function(source, indent) {
     println("Enter CodeFactory.getParameters")
     var paraSrcCode = "";
 
@@ -194,6 +201,12 @@ CodeFactory.getParameters = function(source) {
         var i = 0;
         for (i=0; i<n; i++) {
             parameter = source.GetParameterAt(i);
+
+            if (parameter.Name != "") {
+                methodComment += indent + " * @param " + parameter.Name + " " 
+                    + parameter.Documentation + "\n";
+            }
+
             if (parameter.MOF_GetAttribute("DirectionKind") != "pdkReturn") {
                 paraSrcCode += parameter.TypeExpression + " " + parameter.Name;
             }
@@ -244,6 +257,33 @@ CodeFactory.getMethodImpl = function(source, indent) {
     return "";
 }
 
+CodeFactory.fileComment = function() {
+    var sourceCode = gCommentStart;
+    sourceCode += " * Copyright " + StarUMLProject().Copyright;
+    sourceCode += "\n *\n * @project " + StarUMLProject().Title;
+    sourceCode += "\n *\n * @company " + StarUMLProject().Company;
+    sourceCode += "\n *\n * @author " + StarUMLProject().Author;
+    sourceCode += "\n" +gCommentEnd + "\n\n";
+    print(sourceCode);
+}
+
+CodeFactory.commentLine = function(line, indent) {
+    return indent + " * " + line + "\n";
+}
+
+CodeFactory.comment = function(source, indent) {
+    var commtents = indent + gCommentStart;
+    var doc = source.Documentation.replace(/\r\n/g, "\n");
+    doc = doc.replace(/\r/g, "\n");
+    println("document = " + doc);
+
+    var lines = doc.split("\n");
+    for(i=0; i<lines.length; i++) {
+        commtents += CodeFactory.commentLine(lines[i], indent);             
+    }
+    return commtents;
+}
+
 @>
 
 <@REPEAT {R}::;UMLClassifier;;@>
@@ -260,9 +300,13 @@ CodeFactory.getMethodImpl = function(source, indent) {
 
         fileBegin(fileName);
 
+        CodeFactory.fileComment();
+
         if (packageInfo != "") {
-            println("package " + packageInfo + ";\n")
+            print("package " + packageInfo + ";\n\n")
         }
+
+
         print(sourceCode);
 
         fileEnd();
