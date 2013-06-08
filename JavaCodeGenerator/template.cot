@@ -60,7 +60,7 @@ CodeFactory.getOOSourceCode = function(source, type) {
     var geners = CodeFactory.getGeneralization(source);
     var impIfs = CodeFactory.getImplInterface(source);
     var attrs = CodeFactory.getAttrsCode(source, gIndent);
-    var methods = CodeFactory.getMethodsCode(source, gIndent);
+    var methods = CodeFactory.getMethodsCode(source, type, gIndent);
 
     if (type == "interface") {
         return sourceCode + "public interface " + source.Name 
@@ -99,6 +99,10 @@ CodeFactory.getImplInterface = function(source) {
         }
         sourceCode += depen.Supplier.Name;
     }
+
+    if (sourceCode == "") {
+        return "";
+    }
     return "implements " + sourceCode + " ";
 }
 
@@ -121,7 +125,7 @@ CodeFactory.getAttrsCode = function(source, indent) {
     return sourceCode;
 }
 
-CodeFactory.getMethodsCode = function(source, indent) {
+CodeFactory.getMethodsCode = function(source, type, indent) {
     var sourceCode = "";
     var n = source.GetOperationCount();
     println("Operation num is " + n)
@@ -135,16 +139,20 @@ CodeFactory.getMethodsCode = function(source, indent) {
         scope      = CodeFactory.getScope(operation);
         parameters = CodeFactory.getParameters(operation, indent);
 
-        var type = "";
+        var returnType = "";
         if (operation.StereotypeName != "create") {
-            type   = CodeFactory.getReturnType(operation);
+            returnType   = CodeFactory.getReturnType(operation);
         }
 
         body       = CodeFactory.getMethodImpl(operation, gIndent + gIndent);
 
         sourceCode +=  methodComment + gIndent + gCommentEnd + indent + visibility + scope 
-            + type + operation.Name + "("  + parameters + ") {\n";
-        sourceCode +=  body + indent + "}\n\n";
+            + returnType + operation.Name + "("  + parameters + ")";
+        if (type == "interface") {
+            sourceCode += ";\n\n";
+        } else {
+            sourceCode +=  "{\n" + body + indent + "}\n\n";
+        }
     }
     return sourceCode;
 }
