@@ -18,7 +18,7 @@ Installation
 Usage
 -----
 1. Design your software by class diagram
-2. Open menu "Tools->StarUML Generator ..."
+2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/guide_menu1.png)
 3. Select "Java code generator" and configure it by "Opt." 
 4. button if you want to customize it
 4. Click the "Next" button and select the directory that you want to store the generated code
