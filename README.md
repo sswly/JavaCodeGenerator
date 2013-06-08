@@ -1,6 +1,6 @@
 JavaCodeGenerator
 =================
-
+UML to Java code. 
 A Java code generator template for StarUML
 
 
@@ -19,7 +19,8 @@ Usage
 -----
 1. Design your software by class diagram
 2. Open menu "Tools->StarUML Generator ..."
-3. Select "Java code generator" and configure it by "Opt." button if you want to customize it
+3. Select "Java code generator" and configure it by "Opt." 
+4. button if you want to customize it
 4. Click the "Next" button and select the directory that you want to store the generated code
 5. Click the "Next" button and press the "Generate" button at the following step
 6. Click the "Finish" button to finish the code generation
