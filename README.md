@@ -19,11 +19,10 @@ Usage
 -----
 1. Design your software by class diagram
 2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/guide_menu1.png)
-3. Select "Java code generator" and configure it by "Opt." 
-4. button if you want to customize it
-4. Click the "Next" button and select the directory that you want to store the generated code
-5. Click the "Next" button and press the "Generate" button at the following step
-6. Click the "Finish" button to finish the code generation
+3. Select "Java code generator" and configure it by "Opt." button if you want to customize it<br>![guide config](docs/guide_config1.png)<br>![guide config](docs/guide_config2.png)
+4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide menu](docs/guide_config3.png)
+5. Click the "Next" button and press the "Generate" button at the following step<br>![guide menu](docs/guide_config4.png)
+6. Click the "Finish" button to finish the code generation<br>![guide menu](docs/guide_config5.png)
 
 
 Feature
