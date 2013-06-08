@@ -17,12 +17,13 @@ Installation
 
 Usage
 -----
-1. Design your software by class diagram
+1. Design your software by class diagram. Example: <br>![guide uml](docs/guide_uml1.png)![guide uml](docs/guide_uml2.png)![guide uml](docs/guide_uml3.png)
 2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/guide_menu1.png)
 3. Select "Java code generator" and configure it by "Opt." button if you want to customize it<br>![guide config](docs/guide_config1.png)<br>![guide config](docs/guide_config2.png)
-4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide menu](docs/guide_config3.png)
-5. Click the "Next" button and press the "Generate" button at the following step<br>![guide menu](docs/guide_config4.png)
-6. Click the "Finish" button to finish the code generation<br>![guide menu](docs/guide_config5.png)
+4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide config](docs/guide_config3.png)
+5. Click the "Next" button and press the "Generate" button at the following step<br>![guide config](docs/guide_config4.png)
+6. Click the "Finish" button to finish the code generation<br>![guide config](docs/guide_config5.png)
+7. Check the generated code in Eclipse<br>![guide sample code](docs/guide_sample_code1.png)<br>![guide sample code](docs/guide_sample_code2.png)
 
 
 Feature
