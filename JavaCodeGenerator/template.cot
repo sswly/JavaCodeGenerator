@@ -8,6 +8,9 @@ var startLine = getArgument("CodeStartMarkLine");
 var endLine = getArgument("CodeEndMarkLine");
 var target = getArgument("target");
 
+var packageInfo = "";
+var importsList = "";
+
 CodeFactory = {};
 
 CodeFactory.getSourceCode = function(source) {
@@ -36,6 +39,7 @@ CodeFactory.getSourceCode = function(source) {
 
 CodeFactory.getFileName = function(source) {
     var path = getTarget() + "\\";
+    println("CodeFactory.getFileName.Pathname " + source.Pathname);
     var names = source.Pathname.split("::");
     for (i=2; i<names.length; i++) {
         if (names[i] == source.Name) {
@@ -78,6 +82,10 @@ CodeFactory.getGeneralization = function(source) {
         gener = source.GetGeneralizationAt(i);
 
         if (source.Name == gener.Child.Name) {
+            var pathName = gener.Parent.Pathname;
+            pathName = pathName.substr(pathName.indexOf("::", 2) + 2);
+            pathName = pathName.replace(/::/g, ".");
+            importsList += "import " + pathName + ";\n"
             return "extends " + gener.Parent.Name + " ";
         }
     }
@@ -97,7 +105,13 @@ CodeFactory.getImplInterface = function(source) {
         if (sourceCode != "") {
             sourceCode += ", ";
         }
+        
         sourceCode += depen.Supplier.Name;
+        var pathName = depen.Supplier.Pathname;
+        pathName = pathName.substr(pathName.indexOf("::", 2) + 2);
+        pathName = pathName.replace(/::/g, ".");
+        importsList += "import " + pathName + ";\n"
+        println("getImplInterface.pathName " + pathName);
     }
 
     if (sourceCode == "") {
@@ -295,10 +309,25 @@ CodeFactory.comment = function(source, indent) {
     return commtents;
 }
 
+CodeFactory.header = function() {
+    CodeFactory.fileComment();
+
+    if (packageInfo != "") {
+        print("package " + packageInfo + ";\n\n")
+    }
+
+    if (importsList != "") {
+        print(importsList + "\n\n")
+    }
+}
+
 @>
 
 <@REPEAT {R}::;UMLClassifier;;@>
 <@SCRIPT
+    packageInfo = "";
+    importsList = "";
+
     if (candidateClass == "" || candidateClass.indexOf(current().Name) != -1) {
         sourceCode = CodeFactory.getSourceCode(current());
     } else {
@@ -306,17 +335,11 @@ CodeFactory.comment = function(source, indent) {
     }
     
     if (sourceCode){
-        var packageInfo = "";
         var fileName = CodeFactory.getFileName(current()); 
 
         fileBegin(fileName);
 
-        CodeFactory.fileComment();
-
-        if (packageInfo != "") {
-            print("package " + packageInfo + ";\n\n")
-        }
-
+        CodeFactory.header();
 
         print(sourceCode);
 
