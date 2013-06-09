@@ -10,9 +10,11 @@ Feature
 * Generate the Java code according to the class define in class diagram
 * Generate the Java code according to the interface define in class diagram
 * Generalization and interface support for class and interface 
+* Generate the import list according to the relationship 
+* Generate method stub code if the method implementation code not define
 * Generate the folder structure according to the package structure in class diagram
 * Embed the method implementation code into the document of method with configurable mark line
-* Generate the code comment that follow the Javdoc define
+* Generate the code comment that follow the Javdoc rule
 
 
 Precondition
