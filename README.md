@@ -19,13 +19,13 @@ Feature
 
 Precondition
 ------------
-1. Install StarUML from https://sourceforge.net/project/showfiles.php?group_id=152825&package_id=169190&release_id=437438
+1. Download and install [StarUML](https://sourceforge.net/project/showfiles.php?group_id=152825&package_id=169190&release_id=437438)
 
 
 Installation
 ------------
-1. Download the template files includes folder
-2. Copy the downloaded files and folder into "StarUML_install_directory\modules\staruml-generator\templates"
+1. Download the template files by ![guide install](docs/guide_install.png) button of project main page
+2. Uncompress the downloaded file and copy the JavaCodeGenerator folder into "StarUML_install_directory\modules\staruml-generator\templates"
 
 
 Getting Started
