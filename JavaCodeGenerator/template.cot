@@ -63,6 +63,7 @@ CodeFactory.getOOSourceCode = function(source, type) {
 
     var geners = CodeFactory.getGeneralization(source);
     var impIfs = CodeFactory.getImplInterface(source);
+    CodeFactory.genAssociatedImportList(source);
     var attrs = CodeFactory.getAttrsCode(source, gIndent);
     var methods = CodeFactory.getMethodsCode(source, type, gIndent);
 
@@ -82,10 +83,7 @@ CodeFactory.getGeneralization = function(source) {
         gener = source.GetGeneralizationAt(i);
 
         if (source.Name == gener.Child.Name) {
-            var pathName = gener.Parent.Pathname;
-            pathName = pathName.substr(pathName.indexOf("::", 2) + 2);
-            pathName = pathName.replace(/::/g, ".");
-            importsList += "import " + pathName + ";\n"
+            CodeFactory.importPackage(gener.Parent.Pathname);
             return "extends " + gener.Parent.Name + " ";
         }
     }
@@ -107,17 +105,25 @@ CodeFactory.getImplInterface = function(source) {
         }
         
         sourceCode += depen.Supplier.Name;
-        var pathName = depen.Supplier.Pathname;
-        pathName = pathName.substr(pathName.indexOf("::", 2) + 2);
-        pathName = pathName.replace(/::/g, ".");
-        importsList += "import " + pathName + ";\n"
-        println("getImplInterface.pathName " + pathName);
+        CodeFactory.importPackage(depen.Supplier.Pathname);
     }
 
     if (sourceCode == "") {
         return "";
     }
     return "implements " + sourceCode + " ";
+}
+
+CodeFactory.genAssociatedImportList = function(source) {
+    var n = source.GetAssociationCount();
+
+    for (i = 0;  i < n; i++) {
+        var other = source.GetAssociationAt(i).GetOtherSide();
+
+        if (other.IsNavigable){
+            CodeFactory.importPackage(other.Participant.Pathname);
+        }
+    }
 }
 
 CodeFactory.getAttrsCode = function(source, indent) {
@@ -280,7 +286,7 @@ CodeFactory.getMethodImpl = function(source, indent) {
             if (lines[i].indexOf(endLine) != -1) {
                 return src;
             }
-            src += indent + lines[i] + "\n";
+            src += indent + lines[i].replace(/\\t/g, gIndent) + "\n";
         }
     }
     return "";
@@ -323,10 +329,39 @@ CodeFactory.comment = function(source, indent) {
     println("document = " + doc);
 
     var lines = doc.split("\n");
+    var hasCode = false;
     for(i=0; i<lines.length; i++) {
-        commtents += CodeFactory.commentLine(lines[i], indent);             
+        if (lines[i].indexOf(startLine) != -1) {
+            hasCode = true;
+        } else if (lines[i].indexOf(endLine) != -1) {
+            hasCode = false;
+        } else if (!hasCode) {
+            commtents += CodeFactory.commentLine(lines[i], indent);             
+        }
     }
     return commtents;
+}
+
+CodeFactory.importPackage = function(Pathname) {
+    var pathName = Pathname.substr(Pathname.indexOf("::", 2) + 2);
+    pathName = pathName.replace(/::/g, ".");
+    importsList += "import " + pathName + ";\n"
+}
+
+CodeFactory.filterClass = function(source) {
+    if (candidateClass == "") {
+        return true; 
+    }
+
+    var filters = candidateClass.split(",");
+    for(i=0; i<filters.length; i++) {
+        var pathName = current().Pathname;
+        pathName = pathName.substr(pathName.indexOf("::", 2) + 2).replace(/::/g, ".");
+        if (pathName.match(filters[i]) != null) {
+            return true;
+        }
+    }
+    return false;
 }
 
 CodeFactory.header = function() {
@@ -348,7 +383,7 @@ CodeFactory.header = function() {
     packageInfo = "";
     importsList = "";
 
-    if (candidateClass == "" || candidateClass.indexOf(current().Name) != -1) {
+    if (CodeFactory.filterClass(current())) {
         sourceCode = CodeFactory.getSourceCode(current());
     } else {
         sourceCode = null;
