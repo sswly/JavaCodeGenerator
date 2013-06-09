@@ -134,8 +134,12 @@ CodeFactory.getAttrsCode = function(source, indent) {
     for (i = 0;  i < n; i++) {
         var attr = source.GetAttributeAt(i);
 
-        visibility = CodeFactory.getVisibility(attr);
-        sourceCode += indent + visibility + attr.TypeExpression + " " + attr.Name + ";\n";
+        visibility   = CodeFactory.getVisibility(attr);
+        scope        = CodeFactory.getScope(attr);
+        defaultValue = attr.InitialValue ? " = " + attr.InitialValue : "";
+
+        sourceCode += indent + visibility + scope + attr.TypeExpression 
+            + " " + attr.Name + defaultValue + ";\n";
         println(sourceCode);
     }
    
