@@ -216,6 +216,9 @@ CodeFactory.getParameters = function(source, indent) {
             }
 
             if (parameter.MOF_GetAttribute("DirectionKind") != "pdkReturn") {
+                if (paraSrcCode != "") {
+                    paraSrcCode += ", ";
+                }
                 paraSrcCode += parameter.TypeExpression + " " + parameter.Name;
             }
         }
@@ -271,7 +274,7 @@ CodeFactory.fileComment = function() {
     sourceCode += "\n *\n * @project " + StarUMLProject().Title;
     sourceCode += "\n *\n * @company " + StarUMLProject().Company;
     sourceCode += "\n *\n * @author " + StarUMLProject().Author;
-    sourceCode += "\n" +gCommentEnd + "\n\n";
+    sourceCode += "\n" +gCommentEnd + "\n";
     print(sourceCode);
 }
 
