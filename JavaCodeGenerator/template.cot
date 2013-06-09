@@ -159,6 +159,10 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
         }
 
         body       = CodeFactory.getMethodImpl(operation, gIndent + gIndent);
+        if (body == "") {
+            body = CodeFactory.getDefaultMethodImpl(returnType, gIndent + gIndent);
+            println("CodeFactory.getMethodsCode.body " + body);
+        }
 
         sourceCode +=  methodComment + gIndent + gCommentEnd + indent + visibility + scope 
             + returnType + operation.Name + "("  + parameters + ")";
@@ -278,6 +282,22 @@ CodeFactory.getMethodImpl = function(source, indent) {
             }
             src += indent + lines[i] + "\n";
         }
+    }
+    return "";
+}
+
+CodeFactory.getDefaultMethodImpl = function(returnType, indent) {
+    println("CodeFactory.getDefaultMethodImpl.returnType " + returnType); 
+    var sourceCode = indent + "// TODO Auto-generated method stub\n";
+    if (returnType.indexOf("String") != -1) {
+        return sourceCode + indent + "return null;\n";
+    } else if (returnType.indexOf("boolean") != -1) {
+        return sourceCode + indent + "return false;\n";
+    } else if (returnType.indexOf("int") != -1 || returnType.indexOf("short") != -1 
+            || returnType.indexOf("long") != -1) {
+        return sourceCode + indent + "return 0;\n";
+    } else if (returnType.indexOf("float") != -1 || returnType.indexOf("double") != -1) {
+        return sourceCode + indent + "return 0.0;\n";
     }
     return "";
 }
