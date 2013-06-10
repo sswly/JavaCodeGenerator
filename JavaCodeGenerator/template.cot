@@ -138,7 +138,7 @@ CodeFactory.getAttrsCode = function(source, indent) {
         scope        = CodeFactory.getScope(attr);
         defaultValue = attr.InitialValue ? " = " + attr.InitialValue : "";
 
-        sourceCode += indent + visibility + scope + attr.TypeExpression 
+        sourceCode += indent + visibility + scope + CodeFactory.getType(attr) 
             + " " + attr.Name + defaultValue + ";\n";
         println(sourceCode);
     }
@@ -159,6 +159,7 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
         operation = source.GetOperationAt(i);
 
         methodComment = CodeFactory.comment(operation, gIndent);
+	utAnno = operation.StereotypeName == "Test" ? gIndent + "@Test\n" : "";
         visibility = CodeFactory.getVisibility(operation);
         scope      = CodeFactory.getScope(operation);
         parameters = CodeFactory.getParameters(operation, indent);
@@ -174,8 +175,8 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
             println("CodeFactory.getMethodsCode.body " + body);
         }
 
-        sourceCode +=  methodComment + gIndent + gCommentEnd + indent + visibility + scope 
-            + returnType + operation.Name + "("  + parameters + ")";
+        sourceCode +=  methodComment + gIndent + gCommentEnd + utAnno + indent + visibility 
+                + scope + returnType + operation.Name + "("  + parameters + ")";
         if (type == "interface") {
             sourceCode += ";\n\n";
         } else {
@@ -247,7 +248,7 @@ CodeFactory.getParameters = function(source, indent) {
                 if (paraSrcCode != "") {
                     paraSrcCode += ", ";
                 }
-                paraSrcCode += parameter.TypeExpression + " " + parameter.Name;
+                paraSrcCode += CodeFactory.getType(parameter) + " " + parameter.Name;
             }
         }
     } catch(error) {
@@ -263,7 +264,7 @@ CodeFactory.getReturnType = function(source) {
         for (i=0; i<n; i++) {
             parameter = source.GetParameterAt(i);
             if (parameter.MOF_GetAttribute("DirectionKind") == "pdkReturn") {
-                return parameter.TypeExpression + " ";
+                return CodeFactory.getType(parameter);
             }
         }
     } catch(error) {
@@ -299,8 +300,8 @@ CodeFactory.getMethodImpl = function(source, indent) {
 CodeFactory.getDefaultMethodImpl = function(returnType, indent) {
     println("CodeFactory.getDefaultMethodImpl.returnType " + returnType); 
     var sourceCode = indent + "// TODO Auto-generated method stub\n";
-    if (returnType.indexOf("String") != -1) {
-        return sourceCode + indent + "return null;\n";
+    if (returnType == "" || returnType.indexOf("void") != -1) {
+        return ""; 
     } else if (returnType.indexOf("boolean") != -1) {
         return sourceCode + indent + "return false;\n";
     } else if (returnType.indexOf("int") != -1 || returnType.indexOf("short") != -1 
@@ -309,7 +310,7 @@ CodeFactory.getDefaultMethodImpl = function(returnType, indent) {
     } else if (returnType.indexOf("float") != -1 || returnType.indexOf("double") != -1) {
         return sourceCode + indent + "return 0.0;\n";
     }
-    return "";
+    return sourceCode + indent + "return null;\n";
 }
 
 CodeFactory.fileComment = function() {
@@ -344,6 +345,15 @@ CodeFactory.comment = function(source, indent) {
         }
     }
     return commtents;
+}
+
+CodeFactory.getType = function(source) {
+    if (source.TypeExpression != "") {
+        return source.TypeExpression + " ";
+    } else {
+        return source.Type_.Name + " ";
+    }
+    return "";
 }
 
 CodeFactory.importPackage = function(Pathname) {
