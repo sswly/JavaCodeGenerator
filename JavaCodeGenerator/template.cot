@@ -39,7 +39,7 @@ CodeFactory.getSourceCode = function(source) {
 
 CodeFactory.getFileName = function(source) {
     var path = getTarget() + "\\";
-    println("CodeFactory.getFileName.Pathname " + source.Pathname);
+    //println("CodeFactory.getFileName.Pathname " + source.Pathname);
     var names = source.Pathname.split("::");
     for (i=2; i<names.length; i++) {
         if (names[i] == source.Name) {
@@ -129,10 +129,11 @@ CodeFactory.genAssociatedImportList = function(source) {
 CodeFactory.getAttrsCode = function(source, indent) {
     var sourceCode = "";
     var n = source.GetAttributeCount();
-    println("number of attr is " + n);
+    println("[INFO] The number of attribute is " + n);
     var i;
     for (i = 0;  i < n; i++) {
         var attr = source.GetAttributeAt(i);
+        println("[INFO] Start to parse attribute: " + attr.Name);
 
         visibility   = CodeFactory.getVisibility(attr);
         scope        = CodeFactory.getScope(attr);
@@ -140,7 +141,7 @@ CodeFactory.getAttrsCode = function(source, indent) {
 
         sourceCode += indent + visibility + scope + CodeFactory.getType(attr) 
             + " " + attr.Name + defaultValue + ";\n";
-        println(sourceCode);
+        //println(sourceCode);
     }
    
     if (sourceCode.localeCompare("") != 0) {
@@ -152,11 +153,11 @@ CodeFactory.getAttrsCode = function(source, indent) {
 CodeFactory.getMethodsCode = function(source, type, indent) {
     var sourceCode = "";
     var n = source.GetOperationCount();
-    println("Operation num is " + n)
+    println("[INFO] The number of method is " + n);
     var i = 0;
     for (i=0; i < n; i++) {
-        println("current round is " + i)
         operation = source.GetOperationAt(i);
+        println("[INFO] Start to parse method: " + operation.Name);
 
         methodComment = CodeFactory.comment(operation, gIndent);
 	utAnno = operation.StereotypeName == "Test" ? gIndent + "@Test\n" : "";
@@ -172,7 +173,7 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
         body       = CodeFactory.getMethodImpl(operation, gIndent + gIndent);
         if (body == "") {
             body = CodeFactory.getDefaultMethodImpl(returnType, gIndent + gIndent);
-            println("CodeFactory.getMethodsCode.body " + body);
+            //println("CodeFactory.getMethodsCode.body " + body);
         }
 
         sourceCode +=  methodComment + gIndent + gCommentEnd + utAnno + indent + visibility 
@@ -230,7 +231,7 @@ CodeFactory.getScope = function(source) {
 }
 
 CodeFactory.getParameters = function(source, indent) {
-    println("Enter CodeFactory.getParameters")
+    //println("Enter CodeFactory.getParameters")
     var paraSrcCode = "";
 
     try {
@@ -248,12 +249,12 @@ CodeFactory.getParameters = function(source, indent) {
                 if (paraSrcCode != "") {
                     paraSrcCode += ", ";
                 }
-                paraSrcCode += CodeFactory.getType(parameter) + " " + parameter.Name;
+                paraSrcCode += CodeFactory.getType(parameter) + parameter.Name;
             }
         }
     } catch(error) {
     }
-    println(paraSrcCode)
+    //println(paraSrcCode)
     return paraSrcCode;
 }
 
@@ -298,7 +299,7 @@ CodeFactory.getMethodImpl = function(source, indent) {
 }
 
 CodeFactory.getDefaultMethodImpl = function(returnType, indent) {
-    println("CodeFactory.getDefaultMethodImpl.returnType " + returnType); 
+    //println("CodeFactory.getDefaultMethodImpl.returnType " + returnType); 
     var sourceCode = indent + "// TODO Auto-generated method stub\n";
     if (returnType == "" || returnType.indexOf("void") != -1) {
         return ""; 
@@ -331,7 +332,7 @@ CodeFactory.comment = function(source, indent) {
     var commtents = indent + gCommentStart;
     var doc = source.Documentation.replace(/\r\n/g, "\n");
     doc = doc.replace(/\r/g, "\n");
-    println("document = " + doc);
+    //println("document = " + doc);
 
     var lines = doc.split("\n");
     var hasCode = false;
@@ -398,6 +399,7 @@ CodeFactory.header = function() {
     importsList = "";
 
     if (CodeFactory.filterClass(current())) {
+        println("[INFO] Start to parse " + current().Pathname);
         sourceCode = CodeFactory.getSourceCode(current());
     } else {
         sourceCode = null;
