@@ -24,18 +24,18 @@ Precondition
 
 Installation
 ------------
-1. Download the template files by ![guide install](docs/guide_install.png) button of project main page
+1. Download the template files by ![guide install](docs/images/guide_install.png) button of project main page
 2. Uncompress the downloaded file and copy the JavaCodeGenerator folder into "StarUML_install_directory\modules\staruml-generator\templates"
 
 
 Getting Started
 ---------------
-1. Design your software by class diagram. Example: <br>![guide uml](docs/guide_uml1.png)![guide uml](docs/guide_uml2.png)![guide uml](docs/guide_uml3.png)
-2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/guide_menu1.png)
-3. Select "Java code generator" and configure it by "Opt." button if you want to customize it<br>![guide config](docs/guide_config1.png)<br>![guide config](docs/guide_config2.png)
-4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide config](docs/guide_config3.png)
-5. Click the "Next" button and press the "Generate" button at the following step<br>![guide config](docs/guide_config4.png)
-6. Click the "Finish" button to finish the code generation<br>![guide config](docs/guide_config5.png)
+1. Design your software by class diagram. Example: <br>![guide uml](docs/images/guide_uml1.png)![guide uml](docs/images/guide_uml2.png)![guide uml](docs/guide_uml3.png)
+2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/images/guide_menu1.png)
+3. Select "Java code generator" and configure it by "Opt." button if you want to customize it<br>![guide config](docs/images/guide_config1.png)<br>![guide config](docs/guide_config2.png)
+4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide config](docs/images/guide_config3.png)
+5. Click the "Next" button and press the "Generate" button at the following step<br>![guide config](docs/images/guide_config4.png)
+6. Click the "Finish" button to finish the code generation<br>![guide config](docs/images/guide_config5.png)
 7. Check the generated code in Eclipse:
 
 ```Java
