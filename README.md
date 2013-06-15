@@ -30,7 +30,7 @@ Installation
 
 Getting Started
 ---------------
-1. Design your software by class diagram. Example: <br>![guide uml](docs/images/guide_uml1.png)![guide uml](docs/images/guide_uml2.png)![guide uml](docs/guide_uml3.png)
+1. Design your software by class diagram. Example: <br>![guide uml](docs/images/guide_uml1.png)![guide uml](docs/images/guide_uml2.png)![guide uml](docs/images/guide_uml3.png)
 2. Open menu "Tools->StarUML Generator ..."<br>![guide menu](docs/images/guide_menu1.png)
 3. Select "Java code generator" and configure it by "Opt." button if you want to customize it<br>![guide config](docs/images/guide_config1.png)<br>![guide config](docs/guide_config2.png)
 4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide config](docs/images/guide_config3.png)
