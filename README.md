@@ -36,5 +36,46 @@ Getting Started
 4. Click the "Next" button and select the directory that you want to store the generated code<br>![guide config](docs/guide_config3.png)
 5. Click the "Next" button and press the "Generate" button at the following step<br>![guide config](docs/guide_config4.png)
 6. Click the "Finish" button to finish the code generation<br>![guide config](docs/guide_config5.png)
-7. Check the generated code in Eclipse<br>![guide sample code](docs/guide_sample_code1.png)<br>![guide sample code](docs/guide_sample_code2.png)
+7. Check the generated code in Eclipse:
 
+```Java
+/**
+ * Copyright 
+ *
+ * @project Hello World
+ *
+ * @company 
+ *
+ * @author sswlymail@gmail.com
+ */
+
+/**
+ * 
+ */
+public class HelloWorld {
+    public String  who;
+
+
+    /**
+     * @param who 
+     */
+    public HelloWorld(String who){
+        this.who = who;
+    }
+
+    /**
+     */
+    public void sayHello(){
+        System.out.println(who + " say: Hello world!");
+    }
+
+    /**
+     * @param args 
+     */
+    public static void main(String[] args){
+        HelloWorld hello = new HelloWorld("Baby");
+        hello.sayHello();
+    }
+
+}
+```
