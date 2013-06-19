@@ -182,4 +182,70 @@ public class ExampleClass6 {
 </td>
 </tr>
 
+<tr>
+<td><img src="images/example7.png" /></td>
+<td><img src="images/arrow.png" /></td>
+<td><pre>
+/**
+ * Copyright 
+ *
+ * @project Untitled
+ *
+ * @company 
+ *
+ * @author 
+ */
+
+import com.dummy.ExternalClass;
+
+
+/**
+ * 
+ */
+public class ExampleClass7 {
+    /**
+     * 
+     * @param arg 
+     */
+    public boolean fun(ExternalClass arg){
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+}</pre>
+</td>
+</tr>
+
+<tr>
+<td><img src="images/example8.png" /></td>
+<td><img src="images/arrow.png" /></td>
+<td><pre>
+/**
+ * Copyright 
+ *
+ * @project Untitled
+ *
+ * @company 
+ *
+ * @author 
+ */
+
+/**
+ * 
+ */
+public class ExampleClass8 {
+    /**
+     * @param arg 
+     */
+    public boolean myFun(String arg){
+        for (int i = 0; i &lt; 100; i++) {
+            System.out.println(arg + " say hello.");
+        }
+        return true;
+    }
+
+}</pre>
+</td>
+</tr>
+
 </table>
