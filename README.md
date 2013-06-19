@@ -4,6 +4,8 @@ JavaCodeGenerator
 
 A Java code generator template for StarUML
 
+Please reference the [examples](docs/example.md) for detail.
+
 
 Feature
 -------
