@@ -170,6 +170,10 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
             returnType   = CodeFactory.getReturnType(operation);
         }
 
+	if (operation.StereotypeName == "native") {
+            visibility += "native ";
+        }
+        
         body       = CodeFactory.getMethodImpl(operation, gIndent + gIndent);
         if (body == "") {
             body = CodeFactory.getDefaultMethodImpl(returnType, gIndent + gIndent);
@@ -178,7 +182,7 @@ CodeFactory.getMethodsCode = function(source, type, indent) {
 
         sourceCode +=  methodComment + gIndent + gCommentEnd + utAnno + indent + visibility 
                 + scope + returnType + operation.Name + "("  + parameters + ")";
-        if (type == "interface") {
+        if (type == "interface" || operation.StereotypeName == "native") {
             sourceCode += ";\n\n";
         } else {
             sourceCode +=  "{\n" + body + indent + "}\n\n";
