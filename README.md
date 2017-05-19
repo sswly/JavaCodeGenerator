@@ -26,7 +26,7 @@ Precondition
 
 Installation
 ------------
-1. Download the template files by ![docs/images/guide_install.png](https://github.com/sswly/JavaCodeGenerator/archive/master.zip) button of project main page
+1. Download the ![template files](https://github.com/sswly/JavaCodeGenerator/archive/master.zip) button of project main page
 2. Uncompress the downloaded file and copy the JavaCodeGenerator folder into "StarUML_install_directory\modules\staruml-generator\templates"
 
 
